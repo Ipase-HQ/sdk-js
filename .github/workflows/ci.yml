@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  check:
+    name: lint, typecheck, unit tests, size
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run size
+
+  conformance:
+    name: sdk-spec conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: mock server at the spec version this SDK declares
+        run: |
+          SPEC=$(node -p "require('./package.json').ipase.spec")
+          IMAGE="ghcr.io/ipase-hq/sdk-spec/mock-server:$SPEC"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull "$IMAGE"
+          docker run -d --rm -p 8787:8787 --name mock "$IMAGE"
+          # The fixtures come from the same image, so they always match the server's verdicts.
+          docker cp mock:/app/fixtures test/conformance/.fixtures
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8787/__health; then echo; break; fi
+            sleep 1
+          done
+      - run: npm run conformance
+        env:
+          MOCK_SERVER_URL: http://127.0.0.1:8787
+          FIXTURES_DIR: test/conformance/.fixtures
+      - name: mock server log
+        if: failure()
+        run: docker logs mock

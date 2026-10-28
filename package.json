@@ -1,0 +1,66 @@
+{
+  "name": "@ipase/browser",
+  "version": "0.1.0",
+  "description": "Ipase SDK for web and Electron apps: screens, taps, sessions and custom events, batched to the Ipase ingest service",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/ipase.umd.js",
+  "module": "./dist/ipase.mjs",
+  "types": "./dist/types/index.d.ts",
+  "unpkg": "./dist/ipase.umd.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/ipase.mjs",
+      "require": "./dist/ipase.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "ipase": {
+    "spec": "1.0.0-draft.3"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "build": "rollup -c && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "conformance": "vitest run --config vitest.conformance.config.ts",
+    "size": "size-limit",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run size && npm run conformance"
+  },
+  "size-limit": [
+    {
+      "name": "ESM",
+      "path": "dist/ipase.mjs",
+      "limit": "15 KB",
+      "gzip": true
+    },
+    {
+      "name": "UMD",
+      "path": "dist/ipase.umd.js",
+      "limit": "15 KB",
+      "gzip": true
+    }
+  ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@size-limit/file": "^14.3.0",
+    "@types/node": "^22.20.5",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.13.0",
+    "fake-indexeddb": "^6.2.6",
+    "happy-dom": "^21.0.4",
+    "rollup": "^4.66.0",
+    "rollup-plugin-esbuild": "^6.2.1",
+    "size-limit": "^14.3.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  }
+}

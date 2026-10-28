@@ -2,7 +2,7 @@
 
 The Ipase SDK for web and Electron apps. It records screens, taps, sessions and custom events, persists them in IndexedDB, and sends them in batches to the Ipase ingest service. Zero runtime dependencies, ES2019, about 8 KB gzipped.
 
-It implements sdk-spec 1.0.0-draft.3 (`../sdk-spec/protocol.md`). The version is declared in package.json under `ipase.spec` and reported in `context.sdk.spec`.
+It implements sdk-spec 1.0.0-draft.4 (`../sdk-spec/protocol.md`). The version is declared in package.json under `ipase.spec` and reported in `context.sdk.spec`.
 
 ## Use
 

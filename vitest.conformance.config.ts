@@ -6,9 +6,6 @@ export default defineConfig({
   test: {
     include: ["test/conformance/**/*.test.ts"],
     environment: "happy-dom",
-    // The mock server answers no CORS preflight; a production ingest does. happy-dom's fetch is
-    // still the one the SDK uses, so requests go through a browser fetch implementation.
-    environmentOptions: { happyDOM: { settings: { fetch: { disableSameOriginPolicy: true } } } },
     globalSetup: ["test/conformance/mock-server.ts"],
     testTimeout: 30_000,
     hookTimeout: 60_000,

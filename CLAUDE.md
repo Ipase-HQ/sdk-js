@@ -31,4 +31,4 @@ TypeScript SDK for web and Electron apps of the User Monitoring Platform. Built 
 ## Conformance harness notes
 
 - Screen auto-capture is off in the harness: fixture screen names are not pathnames, and an initial-load screen would be an entry screen no fixture expects. Screens are driven through screen(name); taps go through real DOM clicks.
-- happy-dom's same-origin policy is disabled there because the mock server answers no CORS preflight.
+- happy-dom enforces CORS: the mock server answers the preflight (sdk-spec 1.0.0-draft.4, ADR 0009), so a request the browser would block fails here too. The harness's own control calls (/__scenario, /__recorded, /__verify) go through node:http, because happy-dom preflights even a simple GET and the mock server allows only POST.

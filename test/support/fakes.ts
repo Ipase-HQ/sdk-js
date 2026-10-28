@@ -78,7 +78,7 @@ export const CONTEXT: Context = {
   browser: { name: "Chrome", version: "130" },
   locale: "en-GB",
   timezone: "Europe/London",
-  sdk: { name: "js", version: "0.1.0", spec: "1.0.0-draft.3" },
+  sdk: { name: "js", version: "0.1.0", spec: "1.0.0-draft.4" },
 };
 
 /** Deterministic Ids: seeded bytes, and a fixed jitter factor unless overridden. */

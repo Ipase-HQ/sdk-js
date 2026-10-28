@@ -5,7 +5,7 @@ export const SDK_NAME = "js";
 /** This package's semver, in X-SDK and context.sdk.version. */
 export const SDK_VERSION = "0.1.0";
 /** The sdk-spec VERSION this build implements, in context.sdk.spec. */
-export const SPEC_VERSION = "1.0.0-draft.3";
+export const SPEC_VERSION = "1.0.0-draft.4";
 
 /**
  * Default ingest host until the product domain is registered. The .invalid TLD never resolves, so

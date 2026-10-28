@@ -39,7 +39,7 @@ describe("collectContext", () => {
     expect(ctx.platform).toBe("web");
     expect(ctx.app).toEqual({ name: "Shop", version: "3.2.1", bundle_id: window.location.origin });
     expect(ctx.browser).toEqual({ name: "Chrome", version: "130.0.6723.92" });
-    expect(ctx.sdk).toEqual({ name: "js", version: "0.1.0", spec: "1.0.0-draft.3" });
+    expect(ctx.sdk).toEqual({ name: "js", version: "0.1.0", spec: "1.0.0-draft.4" });
     expect(ctx.device!.screen).toMatch(/^\d+x\d+$/);
   });
 

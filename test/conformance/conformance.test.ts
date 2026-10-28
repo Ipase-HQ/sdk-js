@@ -6,6 +6,7 @@
 import { IDBFactory } from "fake-indexeddb";
 import "fake-indexeddb/auto";
 import { readdirSync, readFileSync } from "node:fs";
+import { request } from "node:http";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, inject, it } from "vitest";
 import { createInstance, type Instance, type Options } from "../../src/browser/client";
@@ -41,12 +42,26 @@ function options(config: Record<string, unknown> = {}): Options {
   return out as Options;
 }
 
-async function post(path: string, body: unknown): Promise<any> {
-  const res = await realFetch(`${server}${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  const json = await res.json();
-  if (!res.ok) throw new Error(`${path} answered ${res.status}: ${JSON.stringify(json)}`);
-  return json;
+// Control calls (/__scenario, /__recorded, /__verify) are harness traffic, not SDK traffic, so they
+// go through node:http instead of happy-dom's fetch. Only the SDK's own requests meet browser CORS.
+function control(method: string, path: string, body?: unknown): Promise<any> {
+  return new Promise((done, fail) => {
+    const req = request(`${server}${path}`, { method, headers: { "content-type": "application/json" } }, (res) => {
+      let text = "";
+      res.setEncoding("utf8");
+      res.on("data", (chunk: string) => (text += chunk));
+      res.on("end", () => {
+        const json = JSON.parse(text);
+        if ((res.statusCode ?? 0) >= 400) fail(new Error(`${path} answered ${res.statusCode}: ${text}`));
+        else done(json);
+      });
+    });
+    req.on("error", fail);
+    req.end(body === undefined ? undefined : JSON.stringify(body));
+  });
 }
+
+const post = (path: string, body: unknown): Promise<any> => control("POST", path, body);
 
 // The network step toggles this wrapper; the SDK's fetch adapter reads globalThis.fetch per call.
 const realFetch = globalThis.fetch.bind(globalThis);
@@ -162,7 +177,7 @@ class Harness {
         break;
       case "assert_requests": {
         await this.settle();
-        const recorded = await (await realFetch(`${server}/__recorded`)).json();
+        const recorded = await control("GET", "/__recorded");
         if (recorded.requests.length !== step.count) {
           const summary = recorded.requests.map((r: any) => `${r.response.status}:${r.events?.length ?? 0} events`);
           throw new Error(`assert_requests: expected ${step.count} requests, the mock server recorded ${recorded.requests.length} [${summary.join(", ")}]`);
